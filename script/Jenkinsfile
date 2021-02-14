@@ -1,0 +1,21 @@
+pipeline{
+    agent any
+    options{
+        timestamps()
+    }
+    stages{
+        stage('script-stage'){
+            steps{
+                echo "Here in outside script"
+                script{
+                    def browser=['firefox','chrome']
+                    for(int i=0;i<browser.size();i++)
+                    {
+                        echo "Testing for ${browser[i]} browser"
+                    }
+                }
+                echo "finally here"
+            }
+        }
+    }
+}
