@@ -1,0 +1,61 @@
+pipeline{
+    agent none
+    options{
+        buildDiscarder(logRotator(numToKeepStr: '2'))
+        disableResume()
+        disableConcurrentBuilds()
+        timestamps()
+        //parallelsAlwaysFailFast()
+    }
+    environment{
+        val = 'yes'
+    }
+    stages{
+        stage('non parallel'){
+            agent{ node{ label 'master' }}
+            steps{
+                echo "In non parallel step"
+                sh 'sleep 3'
+            }
+        }
+        stage('parallel'){
+            when{
+                environment name:'val',value:'yes'
+            }
+	    failFast true
+            parallel{
+                stage('parallel-1'){
+                    agent{ node{ label 'master' }}
+                    steps{
+                        echo "In parallel-1"
+                        sh 'sleep 3'
+                    }
+                }
+                stage('parallel-2'){
+                    agent{ node{ label 'master' }}
+                    steps{
+                        echo "In parallel-2"
+                        sh 'sleep 3'
+                    }
+                }
+                stage('parallel-3'){
+                    agent{ node{ label 'master' }}
+                    stages{
+                        stage('Nested-1'){
+                            steps{
+                                echo "In nested-1"
+                                sh 'sleep 3'
+                            }
+                        }
+                        stage('Nested-2'){
+                            steps{
+                                echo "In nested-2"
+                                sh 'sleep 3'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
