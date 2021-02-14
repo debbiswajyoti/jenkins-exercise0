@@ -1,0 +1,73 @@
+pipeline{
+    agent none
+    options{
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+        disableConcurrentBuilds()
+        disableResume()
+        timestamps()
+        parallelsAlwaysFailFast()
+    }
+    parameters{
+        choice(name:'PLATFORM_FILTER',choices:['all','linux','windows'],description:'choose your platform')
+    }
+    stages{
+        stage('Build and Test'){
+            matrix{
+                agent{ node{ label 'master' }}
+                when{
+                    beforeAgent true
+                    anyOf{
+                        expression{ params.PLATFORM_FILTER == 'all' }
+                        expression{ params.PLATFORM_FILTER == env.PLATFORM }
+                    }
+                }
+                axes{
+                    axis{
+                        name 'PLATFORM'
+                        values 'linux','windows'
+                    }
+                    axis{
+                        name 'BROWSER'
+                        values 'edge','firefox','chrome'
+                    }
+                }
+                excludes{
+                    exclude{
+                        axis{
+                            name 'PLATFORM'
+                            values 'linux'
+                        }
+                        axis{
+                            name 'BROWSER'
+                            values 'edge'
+                        }
+                    }
+                    exclude{
+                        axis{
+                            name 'PLATFORM'
+                            notValues 'linux'
+                        }
+                        axis{
+                            name 'BROWSER'
+                            values 'chrome'
+                        }
+                    }
+                }
+                stages{
+                    stage('Build'){
+                        steps{
+                            echo "Do build for ${PLATFORM} - ${BROWSER}"
+                            sh 'sleep 2'
+                        }
+                    }
+                    stage('Test'){
+                        steps{
+                            echo "Do test for ${PLATFORM} - ${BROWSER}"
+                            sh 'sleep 2'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
