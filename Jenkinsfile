@@ -6,10 +6,6 @@ pipeline{
         disableResume()
         timestamps()
     }
-    environment{
-        DEPLOY_TO = 'prod'
-        secret = credentials('debbiswajyoti_git')
-    }
     parameters{
         string(name:'NAME',defaultValue:'',description:'person name')
         booleanParam(name:'MALE',defaultValue:false,description:'person gender')
@@ -38,21 +34,21 @@ pipeline{
                 echo "Male: ${params.MALE}"
                 echo "Age group: ${params.AGE}"
             }
-
         }
-	stage('stage-2'){
-	   input{
-		id "stage-2-input"
-		message "Shell we proceed?"
-		ok "Yes, we should"
-		submitter "alice,bob"
-		parameters{
-			string(name:'FNAME',defaultValue:'',description:'submitter name')
-			choice(name:'TYPE',choices:['admin','root','user'],description:'type of submitter')
-		}
-	   }
-	   steps{
-		sh 'echo Input is submitted by ${FNAME} and he is ${TYPE}'
-	   }
+        stage('stage-3'){
+            input{
+                id "stage-2-input"
+                message "Shell we proceed?"
+                ok "Yes, we should"
+                submitter "alice,bob"
+                parameters{
+                        string(name:'FNAME',defaultValue:'',description:'submitter name')
+                        choice(name:'TYPE',choices:['admin','root','user'],description:'type of submitter')
+                }
+            }
+            steps{
+                sh 'echo Input is submitted by ${FNAME} and he is ${TYPE}'
+            }
+        }
     }
 }
