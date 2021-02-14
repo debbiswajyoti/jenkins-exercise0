@@ -1,0 +1,55 @@
+pipeline{
+    agent none
+    options{
+        buildDiscarder(logRotator(numToKeepStr: '2'))
+        disableConcurrentBuilds()
+        disableResume()
+        timestamps()
+        parallelsAlwaysFailFast()
+    }
+    stages{
+        stage('non sequential'){
+            agent{ node{ label 'master' }}
+            steps{
+                sh 'echo In non sequential step'
+                sh 'sleep 3'
+            }
+        }
+        stage('sequential'){
+            agent{ node{ label 'master' }}
+            environment{
+                SEQN = 'sequential-run'
+            }
+            stages{
+                stage('sequential-1'){
+                    steps{
+                        sh 'echo In sequential-1'
+                        sh 'sleep 3'
+                    }
+                }
+                stage('sequential-2'){
+                    steps{
+                        sh 'echo In sequential-2'
+                        sh 'sleep 3'
+                    }
+                }
+                stage('sequential-3-parallel'){
+                    parallel{
+                        stage('parallel-s3-1'){
+                            steps{
+                                sh 'echo In parallel-s3-1'
+                                sh 'sleep 3'
+                            }
+                        }
+                        stage('parallel-s3-2'){
+                            steps{
+                                sh 'echo In parallel-s3-2'
+                                sh 'sleep 3'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
