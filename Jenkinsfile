@@ -6,6 +6,9 @@ pipeline{
         disableResume()
         timestamps()
     }
+    environment{
+	DEPLOY_TO = 'prod'
+    }
     parameters{
         string(name:'NAME',defaultValue:'',description:'person name')
         booleanParam(name:'MALE',defaultValue:false,description:'person gender')
