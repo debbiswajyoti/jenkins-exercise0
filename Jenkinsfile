@@ -40,5 +40,19 @@ pipeline{
             }
 
         }
+	stage('stage-2'){
+	   input{
+		id "stage-2-input"
+		message "Shell we proceed?"
+		ok "Yes, we should"
+		submitter "alice,bob"
+		parameters{
+			string(name:'FNAME',defaultValue:'',description:'submitter name')
+			choice(name:'TYPE',choices:['admin','root','user'],description:'type of submitter')
+		}
+	   }
+	   steps{
+		sh 'echo Input is submitted by ${FNAME} and he is ${TYPE}'
+	   }
     }
 }
