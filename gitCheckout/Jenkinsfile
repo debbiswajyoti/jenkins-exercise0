@@ -1,0 +1,39 @@
+pipeline{
+    agent{
+        node{
+            label 'master'
+        }
+    }
+    options{
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+        disableConcurrentBuilds()
+        disableResume()
+        timestamps()
+    }
+    stages{
+        stage('Clean Workspace'){
+            steps{
+                cleanWs()
+                sh '''
+                    echo "Cleaning up workspace for the project"
+                '''
+            }
+        }
+        stage('Git Clone'){
+            steps{
+                sh '''
+                    echo "cloning project with git option"
+                '''
+                git branch: 'feature', credentialsId: 'debbiswajyoti_git', url: 'https://github.com/debbiswajyoti/jenkins-exercise1-multibranch.git'
+            }
+        }
+        stage('Git Checkout'){
+            steps{
+                sh '''
+                    echo "cloning project with git checkout option which is the preferred method"
+                '''
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'debbiswajyoti_git', url: 'https://github.com/debbiswajyoti/jenkins-exercise0.git']]])
+            }
+        }
+    }
+}
